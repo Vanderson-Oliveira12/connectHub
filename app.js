@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT ?? 3000;
-const db = require("./db");
-const router = require("./router");
+const db = require("./src/db");
+const router = require("./src/router");
 
 app.use(express.json());
 
