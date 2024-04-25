@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT ?? 3000;
 const db = require("./src/db");
 const router = require("./src/router");
 
@@ -16,6 +15,6 @@ db.then(x => {
 })
 
 function handleConnectServer() { 
-    app.listen(PORT, () => console.log(`Server at started in http://localhost:${PORT}`))
+    app.listen(3011, () => console.log(`Server at started in http://localhost:3011`))
 }
 
