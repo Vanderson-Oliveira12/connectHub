@@ -1,6 +1,6 @@
+const mongoose = require("mongoose");
 const ContactModel = require("../model/contact");
 
-const mongoose = require("mongoose");
 
 class ContactController {
   static async getAll(req, res) {
@@ -45,11 +45,58 @@ class ContactController {
     }
   }
 
-  static update() {}
+  static async update(req, res) {
+    
+    const body = req.body;
+    const contactId = req.params.id;
+    let email = body.email;
+
+    const isValidID = mongoose.Types.ObjectId.isValid(contactId);
+    if(!isValidID) return res.status(400).send({message: "ID de usuário inválido"});
+ 
+    const userExits = await ContactModel.findById(contactId);
+    if(!userExits) return res.status(403).send({message: "Usuário não encontrado!"});
+    if(email) {
+      const emailExists = await ContactModel.findOne({email: email});
+      if(emailExists) {
+        if(emailExists.email == email) return res.status(400).send({message: "Você não pode registrar o seu mesmo e-mail de acesso!"})
+      }
+      if(emailExists) return res.status(400).send({email: "Você não pode registrar esse E-mail, pois ele já está em uso!"})
+    }
+
+    try {
+      await ContactModel.findByIdAndUpdate(contactId, {...body});
+
+      res.status(201).send({message: "Usuário editado com sucesso!"});
+
+    } catch(err) {
+      res.status(500).send({message: "Erro interno do servidor!"});
+    }
+  }
 
   static getById() {}
 
-  static delete() {}
+  static async delete(req, res) {
+    const id = req.params.id;
+    const isValidId = mongoose.Types.ObjectId.isValid(id);
+
+    if(!isValidId) return res.status(400).send({message: "Esse ID informado, não é válido!"});
+
+    try {
+      const userExists = await ContactModel.findById(id);
+
+      if(!userExists) return res.status(400).send({message: "Esse usuário não existe!"});
+
+      await ContactModel.findByIdAndDelete(id);
+
+      res.status(200).send({message: "Usuário excluído com sucesso!"})
+  
+    } catch(err) {
+      res.status(500).send({message: "Erro interno do servidor!"});
+    }
+
+
+  }
 }
 
 module.exports = ContactController;
